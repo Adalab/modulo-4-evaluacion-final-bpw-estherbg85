@@ -1,0 +1,33 @@
+{
+  "name": "modulo-4-evaluacion-final-bpw-estherbg85",
+  "version": "0.0.1",
+  "description": "cuentos infantiles",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Adalab/modulo-4-evaluacion-final-bpw-estherbg85.git"
+  },
+  "keywords": [
+    "nodejs",
+    "expressjs",
+    "mysql",
+    "API"
+  ],
+  "author": "Esther Bonilla promo C-pt",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Adalab/modulo-4-evaluacion-final-bpw-estherbg85/issues"
+  },
+  "homepage": "https://github.com/Adalab/modulo-4-evaluacion-final-bpw-estherbg85#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mysql2": "^3.13.0"
+  }
+}
