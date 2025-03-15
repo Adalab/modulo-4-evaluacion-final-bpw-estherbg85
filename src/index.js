@@ -39,7 +39,21 @@ app.listen(port, () => {
 app.get("/api/books", async (req, res) => {
   const conn = await getConnection();
 
-  const [results] = await conn.query(`SELECT * FROM books;`);
+  //const [results] = await conn.query(`SELECT * FROM books;`);
+
+  const [results] = await conn.query(`
+    SELECT id_book, name, description, id_age, age_range,
+    id_publishter, publishter, 
+    id_rating, rating, 
+    id_book_signing, place,date,community
+
+    FROM books
+
+    JOIN ages ON books.ages_id_age = ages.id_age
+    JOIN publishters ON books.publishters_id_publishter = publishters.id_publishter
+    JOIN ratings ON books.ratings_id_rating = ratings.id_rating
+    JOIN book_signing ON books.book_signing_id_book_signing = book_signing.id_book_signing;
+    ;`);
 
   await conn.end();
 
@@ -63,13 +77,15 @@ app.post("/api/books", async (req, res) => {
 
   const [result] = await conn.execute(
     `INSERT INTO books
-    (name, description, ages_id_age, publishters_id_publishter)
-    VALUES (?,?,?,?);`,
+    (name, description, ages_id_age, publishters_id_publishter, ratings_id_rating, book_signing_id_book_signing)
+    VALUES (?,?,?,?,?,?);`,
     [
       req.body.name,
       req.body.description,
       req.body.ages_id_age,
       req.body.publishters_id_publishter,
+      req.body.ratings_id_rating,
+      req.body.book_signing_id_book_signing,
     ]
   );
 
@@ -107,9 +123,14 @@ app.put("/api/books/:id", async (req, res) => {
 
     await conn.end();
 
-    res.json({
-      success: true,
-    });
+    if (result.affectedRows > 0) {
+      res.json({ success: true, message: "book update" });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "Not update.",
+      });
+    }
   } catch (err) {
     res.status(500).json({
       success: false,
@@ -118,26 +139,59 @@ app.put("/api/books/:id", async (req, res) => {
   }
 });
 
-app.delete("/api/authors/:id", async (req, res) => {
+app.delete("/api/books/:id", async (req, res) => {
   try {
     const conn = await getConnection();
 
     const [result] = await conn.execute(
       `
-    DELETE FROM authors
-    WHERE id_author=?;`,
+    DELETE FROM books
+    WHERE id_book=?;`,
       [req.params.id]
     );
 
     await conn.end();
+
     if (result.affectedRows > 0) {
-      res.json({ success: true, message: "author removed" });
+      res.json({ success: true, message: "book removed" });
     } else {
       res.status(404).json({
         success: false,
-        message: "No author found with that ID.",
+        message: "No book found with that ID.",
       });
     }
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.toString(),
+    });
+  }
+});
+
+app.get("/api/books/:id", async (req, res) => {
+  try {
+    const conn = await getConnection();
+
+    const [result] = await conn.execute(
+      ` SELECT id_book, name, description, id_age, age_range,
+    id_publishter, publishter, 
+    id_rating, rating, 
+    id_book_signing, place,date,community
+
+    FROM books
+
+    JOIN ages ON books.ages_id_age = ages.id_age
+    JOIN publishters ON books.publishters_id_publishter = publishters.id_publishter
+    JOIN ratings ON books.ratings_id_rating = ratings.id_rating
+    JOIN book_signing ON books.book_signing_id_book_signing = book_signing.id_book_signing
+    
+    WHERE id_book=?;`,
+      [req.params.id]
+    );
+
+    await conn.end();
+
+    res.json(result);
   } catch (err) {
     res.status(500).json({
       success: false,
