@@ -60,7 +60,7 @@ app.post("/api/books", async (req, res) => {
   }
 
   const conn = await getConnection();
-  console.log(req.body);
+
   const [result] = await conn.execute(
     `INSERT INTO books
     (name, description, ages_id_age, publishters_id_publishter)
@@ -83,4 +83,37 @@ app.post("/api/books", async (req, res) => {
       id: result.insertId,
     },
   });
+});
+
+app.put("/api/books/:id", async (req, res) => {
+  try {
+    const conn = await getConnection();
+
+    const [result] = await conn.execute(
+      `
+    UPDATE books
+    SET name=?, description=?, ages_id_age=?, publishters_id_publishter=?, ratings_id_rating=?, book_signing_id_book_signing=?
+    WHERE id_book=?;`,
+      [
+        req.body.name,
+        req.body.description,
+        req.body.ages_id_age,
+        req.body.publishters_id_publishter,
+        req.body.ratings_id_rating,
+        req.body.book_signing_id_book_signing,
+        req.params.id,
+      ]
+    );
+
+    await conn.end();
+
+    res.json({
+      success: true,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.toString(),
+    });
+  }
 });
