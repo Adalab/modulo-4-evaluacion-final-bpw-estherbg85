@@ -117,3 +117,31 @@ app.put("/api/books/:id", async (req, res) => {
     });
   }
 });
+
+app.delete("/api/authors/:id", async (req, res) => {
+  try {
+    const conn = await getConnection();
+
+    const [result] = await conn.execute(
+      `
+    DELETE FROM authors
+    WHERE id_author=?;`,
+      [req.params.id]
+    );
+
+    await conn.end();
+    if (result.affectedRows > 0) {
+      res.json({ success: true, message: "author removed" });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "No author found with that ID.",
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.toString(),
+    });
+  }
+});
