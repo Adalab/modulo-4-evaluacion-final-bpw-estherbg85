@@ -52,7 +52,7 @@ app.get("/api/books", async (req, res) => {
 });
 
 app.post("/api/books", async (req, res) => {
-  if (req.body.name === "") {
+  if (!req.body.name || req.body.name === "") {
     return res.status(400).json({
       success: false,
       error: "the name is incorrect",
@@ -60,7 +60,7 @@ app.post("/api/books", async (req, res) => {
   }
 
   const conn = await getConnection();
-
+  console.log(req.body);
   const [result] = await conn.execute(
     `INSERT INTO books
     (name, description, ages_id_age, publishters_id_publishter)
