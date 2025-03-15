@@ -13,7 +13,7 @@ Esta es una API REST para gestionar libros. Permite realizar operaciones CRUD (C
 
 ### 1. Clonar el repositorio
 
-- git clone https://github.com/Adalab/modulo-4-evaluacion-final-bpw-estherbg85. git
+- git clone https://github.com/Adalab/modulo-4-evaluacion-final-bpw-estherbg85.git
 
 ### 2. Instalamos las dependencias
 
