@@ -21,6 +21,8 @@ Esta es una API REST para gestionar libros. Permite realizar operaciones CRUD (C
 - Cors: npm i cors
 - Mysql: npm i mysql2
 - Dotenv: npm i dotenv
+- Bcrypt: npm i bcrypt
+- Jwt: npm i jsonwebtoken
 
 ### 3. Configuramos el archivo .env
 
@@ -30,6 +32,8 @@ Esta es una API REST para gestionar libros. Permite realizar operaciones CRUD (C
 - MYSQL_PASS=tu_contraseña_mysql
 - MYSQL_SCHEMA=tu_base_de_datos
 - PORT=3000 ( puerto por defecto )
+
+- JWT_PASS="3contraseña inventada"
 
 ## Endpoints que he realizado
 
@@ -114,6 +118,47 @@ Respuesta:
 }
 
 ### [GET] /api/libros/:id. Nos devuelve la informacion de un libro específico utilizando su id_book. Usando Url params.
+
+Ejemplo:
+
+http://localhost:3000/api/books/19
+
+Respuesta:
+
+"id_book": 19,
+"name": "cucu tras luna",
+"description": "Este libro incluye las rutinas de antes de ir a dormir: cepillarnos los dientes, apagar la luz y muchas otras sorpresas. Contiene 10 mecanismos hiperfáciles de usar para que las pequeñas manos puedan deslizar, girar y mover las solapas y lengüetas y hacer aparecer divertidos personajes. Además, los mecanismos se encuentran en todas las páginas, de manera que permiten desarrollar ambas lateralidades. Al final del libro encontrarán un espejo para mirarse y sorprenderse. Los acabados son de altísima calidad y el formato en cartón resistente permite que los bebés lo manipulen a su antojo y disfruten de sus primeras experiencias con el formato libro.",
+"id_age": 1,
+"age_range": "0-1",
+"id_publishter": 5,
+"publishter": "timun mas",
+"id_rating": 3,
+"rating": "excelente",
+"id_book_signing": 6,
+"place": "ifema",
+"date": "2025-03-31T22:00:00.000Z",
+"community": "madrid"
+}
+]
+
+### [POST] /api/register. Nos permite registrar a un nuevo usuario en la base de datos.
+
+Esta ruta recibe una solicitud de registro con los datos del usuario (correo electrónico, nombre y contraseña).
+La contraseña sale encriptada.
+
+Si la solicitud es válida, el servidor registra al usuario en la base de datos y genera un token JWT para autenticar futuras solicitudes del usuario.
+
+Si la solicitud es incorrecta (por ejemplo, si falta un campo obligatorio o el correo electrónico ya está en uso), se devuelve un mensaje de error.
+
+### [POST] /api/login. Nos permite a un usuario autenticarse y obtener un token JWT.
+
+Si la solicitud es válida, registra a la usuaria, generando un token.
+
+Si la solicitud no es válida, devuelve un error de login incorrecto.
+
+### FUNCION MiddlewareAuthenticate. Se utiliza para verificar la validez del token JWT. Asegura que las rutas protegidas solo puedan ser accedidas por usuarios con un token válido.
+
+Si no se valida nos devuelve un error de credenciales
 
 Este `README.md` proporciona instrucciones claras sobre cómo instalar, configurar y ejecutar el proyecto, así como detalles sobre los endpoints disponibles para interactuar con la API.
 
