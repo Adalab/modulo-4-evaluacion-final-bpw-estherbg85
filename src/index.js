@@ -40,6 +40,25 @@ async function getConnection() {
   return connection;
 }
 
+// MiddelwareAuthenticate
+
+function middlewareAuthenticate(req, res, next) {
+  const token = req.headers["authorization"];
+
+  if (!token) {
+    return res.status(401).json({ error: "Token not provided" });
+  }
+
+  if (!verifyJWT(token, process.env.JWT_PASS)) {
+    return res.status(401).json({
+      success: false,
+      error: "Invalid credentials",
+    });
+  }
+
+  next();
+}
+
 //Endpoints
 
 app.get("/api/books", async (req, res) => {
@@ -71,7 +90,7 @@ app.get("/api/books", async (req, res) => {
   });
 });
 
-app.post("/api/books", async (req, res) => {
+app.post("/api/books", middlewareAuthenticate, async (req, res) => {
   if (!req.body.name || req.body.name === "") {
     return res.status(400).json({
       success: false,
@@ -107,7 +126,7 @@ app.post("/api/books", async (req, res) => {
   });
 });
 
-app.put("/api/books/:id", async (req, res) => {
+app.put("/api/books/:id", middlewareAuthenticate, async (req, res) => {
   try {
     const conn = await getConnection();
 
@@ -145,7 +164,7 @@ app.put("/api/books/:id", async (req, res) => {
   }
 });
 
-app.delete("/api/books/:id", async (req, res) => {
+app.delete("/api/books/:id", middlewareAuthenticate, async (req, res) => {
   try {
     const conn = await getConnection();
 
@@ -246,8 +265,8 @@ app.post("/api/register", async (req, res) => {
     );
 
     const payload = {
-      name: req.body.name,
       email: req.body.email,
+      password: req.body.password,
     };
 
     const token = jwt.sign(payload, process.env.JWT_PASS, {
@@ -260,58 +279,68 @@ app.post("/api/register", async (req, res) => {
       success: true,
       token: token,
     });
-  } catch (err) {
+  } catch (error) {
     res.status(500).json({
       success: false,
-      error: err,
+      error: error,
     });
   }
 });
 
 app.post("api/login", async (req, res) => {
-  if (!req.body.email) {
-    return res.status(400).json({
-      status: false,
-      error: "Email not specified",
-    });
-  }
-  if (!req.body.password) {
-    return res.status(400).json({
-      status: false,
-      error: "Password not specified",
-    });
-  }
+  try {
+    if (!req.body.email) {
+      return res.status(400).json({
+        status: false,
+        error: "Email not specified",
+      });
+    }
+    if (!req.body.password) {
+      return res.status(400).json({
+        status: false,
+        error: "Password not specified",
+      });
+    }
 
-  const conn = await getConnection();
+    const conn = await getConnection();
 
-  const [resultCheck] = await conn.query(
-    `SELECT *
+    const [resultCheck] = await conn.query(
+      `SELECT *
     FROM users
     WHERE email = ?;`,
-    [req.body.email]
-  );
+      [req.body.email]
+    );
 
-  await conn.end();
+    await conn.end();
 
-  if (resultCheck.length === 0) {
-    return res.status(404).json({
-      status: false,
-      error: "Las credenciales no son válidas",
-    });
-  }
+    if (resultCheck.length === 0) {
+      return res.status(404).json({
+        status: false,
+        error: "The credentials are not valid",
+      });
+    }
 
-  const [userData] = resultCheck;
+    const [userData] = resultCheck[0];
 
-  if (await bcrypt.compare(req.body.password, userData.password)) {
+    const passwordMatch = await bcrypt.compare(
+      req.body.password,
+      userData.password
+    );
+
+    if (!passwordMatch) {
+      return res.status(401).json({
+        status: false,
+        error: "Incorrect login",
+      });
+    }
     // Generar el JWT.
 
     const payload = {
       id_user: userData.id_user,
-      name: userData.name,
       email: userData.email,
+      password: userData.password,
     };
 
-    console.log(payload);
     const token = jwt.sign(payload, process.env.JWT_PASS, {
       expiresIn: "2h",
     });
@@ -320,10 +349,10 @@ app.post("api/login", async (req, res) => {
       success: true,
       token: token,
     });
-  } else {
+  } catch (error) {
     res.status(400).json({
       success: false,
-      error: "Login incorrecto",
+      error: "Internal server error",
     });
   }
 });
