@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "90fd3e02-a19e-4440-b067-69f6861332c2",
 		"name": "API Books",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
 		"_exporter_id": "43107878"
 	},
 	"item": [
@@ -11,18 +11,7 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"url": {
-					"raw": "http://localhost:3000/api/books",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"api",
-						"books"
-					]
-				}
+				"url": "http://localhost:3000/api/books"
 			},
 			"response": []
 		},
@@ -31,19 +20,7 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"url": {
-					"raw": "http://localhost:3000/api/books/33",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"api",
-						"books",
-						"33"
-					]
-				}
+				"url": "http://localhost:3000/api/books/17"
 			},
 			"response": []
 		},
@@ -61,18 +38,7 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:3000/api/books",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"api",
-						"books"
-					]
-				}
+				"url": "http://localhost:3000/api/books"
 			},
 			"response": []
 		},
@@ -90,18 +56,7 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:3000/api/books",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"api",
-						"books"
-					]
-				}
+				"url": "http://localhost:3000/api/books"
 			},
 			"response": []
 		},
@@ -119,48 +74,28 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:3000/api/books",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"api",
-						"books"
-					]
-				}
+				"url": "http://localhost:3000/api/books"
 			},
 			"response": []
 		},
 		{
 			"name": "Update",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
 			"request": {
-				"method": "PUT",
+				"method": "GET",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n        \"name\": \"cucu tras luna 2\",\r\n        \"description\": \"Lorem ipsum Lorem ipsum Lorem ipsum\",\r\n        \"ages_id_age\": 2,\r\n        \"publishters_id_publishter\": 5,\r\n        \"ratings_id_rating\": 3,\r\n        \"book_signing_id_book_signing\": 6\r\n}",
+					"raw": "",
 					"options": {
 						"raw": {
 							"language": "json"
 						}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:3000/api/books/33",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"api",
-						"books",
-						"33"
-					]
-				}
+				"url": "http://localhost:3000/api/books/25"
 			},
 			"response": []
 		},
@@ -178,19 +113,7 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:3000/api/books/9999",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"api",
-						"books",
-						"9999"
-					]
-				}
+				"url": "http://localhost:3000/api/books/9999"
 			},
 			"response": []
 		},
@@ -208,19 +131,7 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:3000/api/books/33",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"api",
-						"books",
-						"33"
-					]
-				}
+				"url": "http://localhost:3000/api/books/33"
 			},
 			"response": []
 		},
@@ -238,19 +149,61 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:3000/api/books/9999",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"api",
-						"books",
-						"9999"
-					]
-				}
+				"url": "http://localhost:3000/api/books/9999"
+			},
+			"response": []
+		},
+		{
+			"name": "Register password hidden",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"esther@gmail.com\",\r\n    \"name\": \"esther\",\r\n    \"password\": \"contraseñaesther\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3000/api/register"
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"elena@gmail.com\",\r\n    \"password\": \"contraseña789\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3000/api/login"
+			},
+			"response": []
+		},
+		{
+			"name": "Login Error",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"usuario@dominio.com\",\r\n  \"password\": \"contraseña123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3000/api/login"
 			},
 			"response": []
 		}

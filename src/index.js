@@ -287,7 +287,8 @@ app.post("/api/register", async (req, res) => {
   }
 });
 
-app.post("api/login", async (req, res) => {
+app.post("/api/login", async (req, res) => {
+  console.log(req);
   try {
     if (!req.body.email) {
       return res.status(400).json({
@@ -350,7 +351,7 @@ app.post("api/login", async (req, res) => {
       token: token,
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(500).json({
       success: false,
       error: "Internal server error",
     });
