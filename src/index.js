@@ -6,7 +6,7 @@ require("dotenv").config();
 const mysql = require("mysql2/promise");
 
 //Autenticación
-
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
@@ -206,54 +206,124 @@ app.get("/api/books/:id", async (req, res) => {
   }
 });
 
-//BONUS
-
-//Autenticación
+// Registro y Login
 
 app.post("/api/register", async (req, res) => {
-  if (!req.body.name || req.body.name === "") {
-    return res.status(400).json({
+  try {
+    if (!req.body.name || req.body.name === "") {
+      return res.status(400).json({
+        success: false,
+        error: "the name is incorrect",
+      });
+    }
+
+    const conn = await getConnection();
+
+    const [resultCheck] = await conn.query(
+      `
+    SELECT *
+    FROM users
+    WHERE email = ?;`,
+      [req.body.email]
+    );
+
+    if (resultCheck.length > 0) {
+      return res.status(409).json({
+        success: false,
+        error: "the email already exists",
+      });
+    }
+
+    //Ciframos la contraseña
+
+    const hiddenPassword = await bcrypt.hash(req.body.password, saltRounds);
+
+    const [resultInsert] = await conn.execute(
+      `INSERT INTO users
+     (email, name, password)
+    VALUES (?,?,?);`,
+      [req.body.email, req.body.name, hiddenPassword]
+    );
+
+    const payload = {
+      name: req.body.name,
+      email: req.body.email,
+    };
+
+    const token = jwt.sign(payload, process.env.JWT_PASS, {
+      expiresIn: "2h",
+    });
+
+    await conn.end();
+
+    res.json({
+      success: true,
+      token: token,
+    });
+  } catch (err) {
+    res.status(500).json({
       success: false,
-      error: "the name is incorrect",
+      error: err,
+    });
+  }
+});
+
+app.post("api/login", async (req, res) => {
+  if (!req.body.email) {
+    return res.status(400).json({
+      status: false,
+      error: "Email not specified",
+    });
+  }
+  if (!req.body.password) {
+    return res.status(400).json({
+      status: false,
+      error: "Password not specified",
     });
   }
 
   const conn = await getConnection();
 
   const [resultCheck] = await conn.query(
-    `
-    SELECT *
+    `SELECT *
     FROM users
     WHERE email = ?;`,
     [req.body.email]
   );
 
-  if (resultCheck.length > 0) {
-    return res.status(409).json({
-      success: false,
-      error: "the email already exists",
+  await conn.end();
+
+  if (resultCheck.length === 0) {
+    return res.status(404).json({
+      status: false,
+      error: "Las credenciales no son válidas",
     });
   }
 
-  //Ciframos la contraseña
+  const [userData] = resultCheck;
 
-  const hiddenPassword = await bcrypt.hash(req.body.password, saltRounds);
+  if (await bcrypt.compare(req.body.password, userData.password)) {
+    // Generar el JWT.
 
-  const [resultInsert] = await conn.execute(
-    `INSERT INTO users
-     (email, name, password)
-    VALUES (?,?,?);`,
-    [req.body.email, req.body.name, hiddenPassword]
-  );
+    const payload = {
+      id_user: userData.id_user,
+      name: userData.name,
+      email: userData.email,
+    };
 
-  await conn.end();
+    console.log(payload);
+    const token = jwt.sign(payload, process.env.JWT_PASS, {
+      expiresIn: "2h",
+    });
 
-  res.json({
-    success: true,
-    id: resultInsert.insertId,
-    user: {
-      ...req.body,
-      id_user: resultInsert.insertId,
-    },
-  });
+    res.json({
+      success: true,
+      token: token,
+    });
+  } else {
+    res.status(400).json({
+      success: false,
+      error: "Login incorrecto",
+    });
+  }
 });
