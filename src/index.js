@@ -5,6 +5,26 @@ const cors = require("cors");
 require("dotenv").config();
 const mysql = require("mysql2/promise");
 
+//Autenticación
+
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
+
+//Configuración Express
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+//Arrancamos el servidor
+
+const port = process.env["PORT"] || 3000;
+
+app.listen(port, () => {
+  console.log(`App listening at <http://localhost:${port}>`);
+});
+
 async function getConnection() {
   const connectionData = {
     host: process.env["MYSQL_HOST"],
@@ -19,20 +39,6 @@ async function getConnection() {
 
   return connection;
 }
-
-//Configuración del servidor
-const app = express();
-
-app.use(cors());
-app.use(express.json());
-
-//Arrancamos el servidor
-
-const port = process.env["PORT"] || 3000;
-
-app.listen(port, () => {
-  console.log(`App listening at <http://localhost:${port}>`);
-});
 
 //Endpoints
 
@@ -205,6 +211,13 @@ app.get("/api/books/:id", async (req, res) => {
 //Autenticación
 
 app.post("/api/register", async (req, res) => {
+  if (!req.body.name || req.body.name === "") {
+    return res.status(400).json({
+      success: false,
+      error: "the name is incorrect",
+    });
+  }
+
   const conn = await getConnection();
 
   const [resultCheck] = await conn.query(
@@ -218,23 +231,29 @@ app.post("/api/register", async (req, res) => {
   if (resultCheck.length > 0) {
     return res.status(409).json({
       success: false,
-      error: "El email ya existe",
+      error: "the email already exists",
     });
   }
+
+  //Ciframos la contraseña
+
+  const hiddenPassword = await bcrypt.hash(req.body.password, saltRounds);
 
   const [resultInsert] = await conn.execute(
     `INSERT INTO users
      (email, name, password)
     VALUES (?,?,?);`,
-    [req.body.email, req.body.name, req.body.password]
+    [req.body.email, req.body.name, hiddenPassword]
   );
 
   await conn.end();
 
   res.json({
-    success: false,
-    error: "error",
+    success: true,
+    id: resultInsert.insertId,
+    user: {
+      ...req.body,
+      id_user: resultInsert.insertId,
+    },
   });
 });
-
-//cifrar contraseña
