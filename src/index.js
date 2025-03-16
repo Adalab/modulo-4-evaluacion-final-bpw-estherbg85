@@ -199,3 +199,42 @@ app.get("/api/books/:id", async (req, res) => {
     });
   }
 });
+
+//BONUS
+
+//Autenticación
+
+app.post("/api/register", async (req, res) => {
+  const conn = await getConnection();
+
+  const [resultCheck] = await conn.query(
+    `
+    SELECT *
+    FROM users
+    WHERE email = ?;`,
+    [req.body.email]
+  );
+
+  if (resultCheck.length > 0) {
+    return res.status(409).json({
+      success: false,
+      error: "El email ya existe",
+    });
+  }
+
+  const [resultInsert] = await conn.execute(
+    `INSERT INTO users
+     (email, name, password)
+    VALUES (?,?,?);`,
+    [req.body.email, req.body.name, req.body.password]
+  );
+
+  await conn.end();
+
+  res.json({
+    success: false,
+    error: "error",
+  });
+});
+
+//cifrar contraseña
